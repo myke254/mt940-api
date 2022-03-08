@@ -15,13 +15,14 @@ const wb = new xl.Workbook();
 var filename = "";
 let bucketName = "jazia-51e09.appspot.com";
 app.use(express.json({ extended: false }));
-
 app.get("/", (req, res) =>res.status(200).send('hello mike'));
 
 var ws;
 const storage = new Storage({
   keyFilename: __dirname + pathtokey,
 });
+var url ="";
+
 
 const uploadFile = async (filename) => {
   // Uploads a local file to the bucket
@@ -36,10 +37,12 @@ const uploadFile = async (filename) => {
       },
     })
     .then((val) => {
-      console.log(val[0].publicUrl());
+      url = val[0].publicUrl();
+      //console.log(url);
     });
 
   console.log(`${filename} uploaded to ${bucketName}.`);
+  return url;
 };
 
 const convertToExcel = async (
@@ -249,7 +252,11 @@ app.post('/mt940', async (req, res) => {
           };
 
           const doit = async () => {
-            await uploadFileAsync();
+            
+            await uploadFileAsync().then((promise)=>{
+              res.status(200).send(url);
+              console.log(url)
+            });
           };
 
           const removefile = () => {
@@ -260,6 +267,7 @@ app.post('/mt940', async (req, res) => {
 
           const rmf = async () => {
             await removefile();
+            res.end();
           };
 
           if (format === "pdf") {
@@ -291,7 +299,10 @@ app.post('/mt940', async (req, res) => {
               rmf()
             });
           }
-          res.status(200).send(JSON.stringify(statement)).end();
+          
+        
+         
+          
         });
     });
 });
