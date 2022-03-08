@@ -16,7 +16,7 @@ var filename = "";
 let bucketName = "jazia-51e09.appspot.com";
 app.use(express.json({ extended: false }));
 
-app.get("/home", (req, res) =>res.send('hello mike'));
+app.get("/", (req, res) =>res.status(200).send('hello mike'));
 
 var ws;
 const storage = new Storage({

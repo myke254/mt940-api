@@ -6,6 +6,9 @@
   "scripts": {
     "start": "npm index.js"
   },
+  "engines": {
+    "node": "16.13.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/myke254/mt940-api.git"
