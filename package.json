@@ -4,8 +4,7 @@
   "description": "api endpoint for converting mt940 statements to either excel or pdf formats in a configurable widget on any platform",
   "main": "index.js",
   "scripts": {
-    "start": "npm index.js",
-    "test": "npm test.js"
+    "start": "npm index.js"
   },
   "repository": {
     "type": "git",
