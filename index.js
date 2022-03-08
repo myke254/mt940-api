@@ -227,7 +227,7 @@ app.post('/mt940', async (req, res) => {
         .then((statements) => {
           statement = statements[0];
           trans = statement.transactions;
-
+          console.log(trans);
           if (get === "range") {
             var newArray = trans.filter(function (x) {
               return parseInt(x.valueDate) <= parseInt(req.body.range.start) && parseInt(x.valueDate )>= parseInt(req.body.range.end);
