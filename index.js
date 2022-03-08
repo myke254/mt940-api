@@ -254,7 +254,9 @@ app.post('/mt940', async (req, res) => {
           const doit = async () => {
             
             await uploadFileAsync().then((promise)=>{
-              res.status(200).send(url);
+              res.status(200).send({
+                'url':url
+              });
               console.log(url)
             });
           };
