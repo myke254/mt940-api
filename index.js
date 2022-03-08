@@ -4,8 +4,6 @@ const { firestore } = require("firebase-admin");
 const { Storage } = require("@google-cloud/storage");
 const app = express();
 const path = require("path");
-const multer = require("multer");
-const cors = require("cors");
 const xl = require("excel4node");
 const fs = require("fs");
 const PDFDocument = require("pdfkit-table");
@@ -18,22 +16,11 @@ var filename = "";
 let bucketName = "jazia-51e09.appspot.com";
 app.use(express.json({ extended: false }));
 
-app.get("/", (req, res) => {
-  //console.log("body :", req.body);
-  //convertToPDF("hello");
-  res.sendStatus(200, JSON.stringify(req.body));
-});
+app.get("/home", (req, res) =>res.send('hello mike'));
 
 var ws;
 const storage = new Storage({
   keyFilename: __dirname + pathtokey,
-});
-
-const uploader = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // limiting files size to 5 MB
-  },
 });
 
 const uploadFile = async (filename) => {
@@ -214,7 +201,7 @@ const convertToPDF = async (
   return filename;
 };
 
-app.post("/mt940", async (req, res) => {
+app.post('/mt940', async (req, res) => {
   var rawUrl = req.body.url;
   var fields = req.body.fields;
   var get = req.body.get;
@@ -229,7 +216,7 @@ app.post("/mt940", async (req, res) => {
   var tempArr = [];
   var statement;
 
-  await fetch(rawUrl)
+  await fetch(rawUrl,{headers: {Authorization: `token ${process.env.GIT_TOKEN}`}})
     .then((response) => response.arrayBuffer())
     .then((buffer) => {
       mt940
