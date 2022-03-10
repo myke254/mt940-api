@@ -64,26 +64,35 @@ const convertToExcel = async (
       heading == "isCredit" ? "type" : heading
     );
   });
-  ws.cell(2, headingColumnNames.length + 2).string(
+  ws.cell(2, headingColumnNames.length + 1).string(
     `OPENING BALANCE AS AT ${openingBalance.date}`
   );
-  ws.cell(3, headingColumnNames.length + 2).string(
+  ws.cell(3, headingColumnNames.length + 1).string(
     `CLOSING BALANCE AS AT ${openingBalance.date}`
   );
-  ws.cell(4, headingColumnNames.length + 2).string(
+  ws.cell(4, headingColumnNames.length + 1).string(
     `CLOSING AVAILABLE BALANCE AS AT ${openingBalance.date}`
   );
   ws
+    .cell(2, headingColumnNames.length + 2)
+    .string(openingBalance.value.toString()),
+    ws
+      .cell(3, headingColumnNames.length + 2)
+      .string(closingBalance.value.toString()),
+    ws
+      .cell(4, headingColumnNames.length + 2)
+      .string(
+        closingAvailableBalance.value.toString()
+      );
+      ws
     .cell(2, headingColumnNames.length + 3)
-    .string(openingBalance.value.toString() + " " + openingBalance.currency),
+    .string(openingBalance.currency),
     ws
       .cell(3, headingColumnNames.length + 3)
-      .string(closingBalance.value.toString() + " " + openingBalance.currency),
+      .string(closingBalance.currency),
     ws
       .cell(4, headingColumnNames.length + 3)
-      .string(
-        closingAvailableBalance.value.toString() + " " + openingBalance.currency
-      );
+      .string(closingAvailableBalance.currency);
   ws
     .cell(2, headingColumnNames.length + 4)
     .string(openingBalance.isCredit == true ? "credit" : "debit"),
