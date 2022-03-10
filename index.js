@@ -46,6 +46,7 @@ const uploadFile = async (filename) => {
 };
 
 const convertToExcel = async (
+  username,
   data,
   headingColumnNames,
   accountNumber,
@@ -54,8 +55,8 @@ const convertToExcel = async (
   closingAvailableBalance
 ) => {
   ws = wb.addWorksheet(`bank statement for ${accountNumber}`);
-  wb.write(`${accountNumber}.xlsx`);
-  filename = __dirname + `/${accountNumber}.xlsx`;
+  
+  filename = __dirname + `/${username}.xlsx`;
   //Write Column Title in Excel file
   let headingColumnIndex = 1;
   headingColumnNames.forEach((heading) => {
@@ -109,6 +110,7 @@ const convertToExcel = async (
     }
     rowIndex++;
   });
+  wb.write(`${username}.xlsx`);
   return filename;
 };
 
@@ -289,6 +291,7 @@ app.post('/mt940', async (req, res) => {
             });
           } else {
             convertToExcel(
+              user,
               newArr,
               fields,
               statement.accountId,
