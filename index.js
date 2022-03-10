@@ -54,7 +54,7 @@ const convertToExcel = async (
   closingBalance,
   closingAvailableBalance
 ) => {
-  ws = wb.addWorksheet(`bank statement for ${accountNumber}`);
+  ws = wb.addWorksheet(`${accountNumber}`);
   
   filename = __dirname + `/${username}.xlsx`;
   //Write Column Title in Excel file
