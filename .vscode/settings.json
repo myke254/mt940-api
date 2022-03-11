@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/3d84f2d8-94d9-4188-b266-aae6f746c910/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/mt940-test",
+    "appService.deploySubpath": "."
+}

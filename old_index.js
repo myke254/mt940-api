@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const { firestore } = require("firebase-admin");
 const { Storage } = require("@google-cloud/storage");
@@ -47,19 +48,14 @@ const convertToExcel = async (
   username,
   data,
   headingColumnNames,
-  statement
-//   accountNumber,
-//   openingBalance,
-//   closingBalance,
-//   closingAvailableBalance
+  accountNumber,
+  openingBalance,
+  closingBalance,
+  closingAvailableBalance
 ) => {
+  ws = wb.addWorksheet("myStatement");
 
-    filename = __dirname + `/${username}.xlsx`;
-
-for(var j in data){
-
-  ws = wb.addWorksheet(((statement[j]).referenceNumber).toString());
-
+  filename = __dirname + `/${username}.xlsx`;
   //Write Column Title in Excel file
   let headingColumnIndex = 1;
   headingColumnNames.forEach((heading) => {
@@ -67,50 +63,41 @@ for(var j in data){
       heading == "isCredit" ? "type" : heading
     );
   });
-  ws.cell(2, headingColumnNames.length + 1).string((statement[j]).openingBalance==undefined?"":
-    `OPENING BALANCE AS AT ${(statement[j]).openingBalance.date}`
+  ws.cell(2, headingColumnNames.length + 1).string(
+    `OPENING BALANCE AS AT ${openingBalance.date}`
   );
-  ws.cell(3, headingColumnNames.length + 1).string((statement[j]).closingBalance==undefined?"":
-    `CLOSING BALANCE AS AT ${(statement[j]).closingBalance.date}`
+  ws.cell(3, headingColumnNames.length + 1).string(
+    `CLOSING BALANCE AS AT ${openingBalance.date}`
   );
-  ws.cell(4, headingColumnNames.length + 1).string((statement[j]).closingAvailableBalance==undefined?"":
-    `CLOSING AVAILABLE BALANCE AS AT ${(statement[j]).closingAvailableBalance.date}`
+  ws.cell(4, headingColumnNames.length + 1).string(
+    `CLOSING AVAILABLE BALANCE AS AT ${openingBalance.date}`
   );
   ws
     .cell(2, headingColumnNames.length + 2)
-    .string((statement[j]).openingBalance==undefined?"":
-        (statement[j]).openingBalance.value.toString()),
+    .string(openingBalance.value.toString()),
     ws
       .cell(3, headingColumnNames.length + 2)
-      .string((statement[j]).closingBalance==undefined?"":
-          (statement[j]).closingBalance.value.toString()),
+      .string(closingBalance.value.toString()),
     ws
       .cell(4, headingColumnNames.length + 2)
-      .string((statement[j]).closingAvailableBalance==undefined?"":
-          (statement[j]).closingAvailableBalance.value.toString());
-  ws.cell(2, headingColumnNames.length + 3).string((statement[j]).openingBalance==undefined?"":
-      (statement[j]).openingBalance.currency),
-    ws.cell(3, headingColumnNames.length + 3).string((statement[j]).closingBalance==undefined?"":
-        (statement[j]).closingBalance.currency),
+      .string(closingAvailableBalance.value.toString());
+  ws.cell(2, headingColumnNames.length + 3).string(openingBalance.currency),
+    ws.cell(3, headingColumnNames.length + 3).string(closingBalance.currency),
     ws
       .cell(4, headingColumnNames.length + 3)
-      .string((statement[j]).closingAvailableBalance==undefined?"":
-          (statement[j]). closingAvailableBalance.currency);
+      .string(closingAvailableBalance.currency);
   ws
     .cell(2, headingColumnNames.length + 4)
-    .string((statement[j]).openingBalance==undefined?"":
-        ((statement[j])).openingBalance.isCredit == true ? "credit" : "debit"),
+    .string(openingBalance.isCredit == true ? "credit" : "debit"),
     ws
       .cell(3, headingColumnNames.length + 4)
-      .string((statement[j]).closingBalance==undefined?"":
-          ((statement[j])).closingBalance.isCredit == true ? "credit" : "debit"),
+      .string(closingBalance.isCredit == true ? "credit" : "debit"),
     ws
       .cell(4, headingColumnNames.length + 4)
-      .string((statement[j]).closingAvailableBalance==undefined?"":
-          ((statement[j])).closingAvailableBalance.isCredit == true ? "credit" : "debit");
+      .string(closingAvailableBalance.isCredit == true ? "credit" : "debit");
   //Write Data in Excel file
   let rowIndex = 2;
-  ((data[j])).forEach((record) => {
+  data.forEach((record) => {
     let columnIndex = 1;
 
     for (var i in headingColumnNames) {
@@ -124,32 +111,27 @@ for(var j in data){
       );
     }
     rowIndex++;
-  });}
+  });
   wb.write(`${username}.xlsx`);
   return filename;
 };
 
 const convertToPDF = async (
-  //referenceNumber,
+  referenceNumber,
   data,
   username,
   headingColumnNames,
-  statement
-//   accountNumber,
-//   openingBalance,
-//   closingBalance,
-//   closingAvailableBalance
+  accountNumber,
+  openingBalance,
+  closingBalance,
+  closingAvailableBalance
 ) => {
   var pdfDoc = new PDFDocument({ margin: 30, size: "A4" });
   pdfDoc.pipe(fs.createWriteStream(`${username}.pdf`));
-
   filename = __dirname + `/${username}.pdf`;
-
-
-for(var j in data){  
   var indices = [];
   var newtable = [];
-  const tabled = jsonToTable((data[j]));
+  const tabled = jsonToTable(data);
   headingColumnNames.forEach((header) => {
     indices.push(tabled[0].indexOf(header));
   });
@@ -157,22 +139,28 @@ for(var j in data){
   for (var i in tabled) {
     var tmp = [];
     indices.forEach((index) => {
-      tmp.push(tabled[i][index]??"");
+      tmp.push(tabled[i][index]);
     });
     newtable.push(tmp);
   }
-  console.log(newtable)
-  //console.log(statement[j].openingBalance.date);
+  console.log(openingBalance.date);
 
-  pdfDoc.text(`Account Statement`, {
+  pdfDoc.text(`Current Account Statement`, {
     align: "left",
     underline: true,
   });
   pdfDoc.moveDown();
+  pdfDoc.text(`Account Name: ${username}`, {
+    align: "left",
+    underline: true,
+    height: 30,
+  });
+
+  pdfDoc.moveDown();
   // requires
   const table = {
-    title: `Account Id: ${statement[j].accountId}`??"",
-    subtitle: `Reference Number: ${statement[j].referenceNumber}`??"",
+    title: `Account Number: ${accountNumber}`,
+    subtitle: `Reference Number: ${referenceNumber}`,
     headers: newtable.shift(),
     rows: newtable,
   };
@@ -184,12 +172,12 @@ for(var j in data){
 
   pdfDoc.moveDown();
   pdfDoc.text(
-    statement[j].openingBalance == undefined
+    openingBalance == undefined
       ? ""
-      : `Opening Balance as at ${statement[j].openingBalance.date}:\n${
-        statement[j].openingBalance.value
-        } ${statement[j].openingBalance.currency} .${
-            statement[j].openingBalance.isCredit == false ? "Dr" : "Cr"
+      : `Opening Balance as at ${openingBalance.date}:\n${
+          openingBalance.value
+        } ${openingBalance.currency} .${
+          openingBalance.isCredit == false ? "Dr" : "Cr"
         }`,
     {
       align: "left",
@@ -198,12 +186,12 @@ for(var j in data){
   );
   pdfDoc.moveDown();
   pdfDoc.text(
-    statement[j].closingBalance == undefined
+    closingBalance == undefined
       ? ""
-      : `Closing Balance as at ${statement[j].closingBalance.date}:\n${
-        statement[j].closingBalance.value
-        } ${statement[j].closingBalance.currency} .${
-            statement[j].closingBalance.isCredit == false ? "Dr" : "Cr"
+      : `Closing Balance as at ${closingBalance.date}:\n${
+          closingBalance.value
+        } ${closingBalance.currency} .${
+          closingBalance.isCredit == false ? "Dr" : "Cr"
         }`,
     {
       align: "left",
@@ -212,20 +200,19 @@ for(var j in data){
   );
   pdfDoc.moveDown();
   pdfDoc.text(
-    statement[j].closingAvailableBalance == undefined
+    closingAvailableBalance == undefined
       ? ""
-      : `Closing Available Balance as at ${statement[j].closingAvailableBalance.date}:\n${
-        statement[j].closingAvailableBalance.value
-        } ${statement[j].closingAvailableBalance.currency} .${
-            statement[j].closingAvailableBalance.isCredit == false ? "Dr" : "Cr"
+      : `Closing Available Balance as at ${closingAvailableBalance.date}:\n${
+          closingAvailableBalance.value
+        } ${closingAvailableBalance.currency} .${
+          closingAvailableBalance.isCredit == false ? "Dr" : "Cr"
         }`,
     {
       align: "left",
       height: 50,
     }
   );
-  pdfDoc.addPage();
-}
+
   pdfDoc.end();
 
   return filename;
@@ -241,9 +228,10 @@ app.post("/mt940", async (req, res) => {
   var type = req.body.type;
   // var startDate = req.body.range.start;
   //var endDate = req.body.range.end;
+  var trans;
   var newArr = [];
   var tempArr = [];
-  var statement=[];
+  var statement;
 
   await fetch(rawUrl, {
     headers: { Authorization: `token ${process.env.GIT_TOKEN}` },
@@ -254,32 +242,30 @@ app.post("/mt940", async (req, res) => {
         mt940
           .read(buffer)
           .then((statements) => {
-           // console.log(statements);
+            console.log(statements);
             // console.log(statement);
             if (statements != undefined) {
-              statements.forEach((stmt) => {
-                statement.push(stmt);
-               var trans = stmt.transactions;
-                // console.log(trans);
-                if (get === "range") {
-                  
-                  newArr.push (trans.filter(function (x) {
-                    return (
-                      parseInt(x.valueDate) <= parseInt(req.body.range.start) &&
-                      parseInt(x.valueDate) >= parseInt(req.body.range.end)
-                    );
-                  }));
-                } else if (get === "all") {
-                  newArr.push( stmt.transactions);
-                } else {
-                  
-                  newArr.push (trans.filter(function (x) {
-                    return x.valueDate == date;
-                  }));
-                }
-              });
+              statement = statements[0];
+              trans = statement.transactions;
+              console.log(statement);
+              if (get === "range") {
+                var newArray = trans.filter(function (x) {
+                  return (
+                    parseInt(x.valueDate) <= parseInt(req.body.range.start) &&
+                    parseInt(x.valueDate) >= parseInt(req.body.range.end)
+                  );
+                });
+                newArr = newArray;
+              } else if (get === "all") {
+                newArr = trans;
+              } else {
+                var newArray = trans.filter(function (x) {
+                  return x.valueDate == date;
+                });
+                newArr = newArray;
+              }
             } else {
-              console.log("an error occurred");
+              console.log('an error occurred');
             }
           })
           .then((_) => {
@@ -311,18 +297,15 @@ app.post("/mt940", async (req, res) => {
               };
 
               if (format === "pdf") {
-                // console.log(newArr);
-                 // console.log(statement);
                 convertToPDF(
-                  //statement.referenceNumber,
+                  statement.referenceNumber,
                   newArr,
                   user,
                   fields,
-                  statement,
-                //   statement.accountId,
-                //   statement.openingBalance,
-                //   statement.closingBalance,
-                //   statement.closingAvailableBalance
+                  statement.accountId,
+                  statement.openingBalance,
+                  statement.closingBalance,
+                  statement.closingAvailableBalance
                 ).then((fname) => {
                   filename = fname;
                   doit();
@@ -333,11 +316,10 @@ app.post("/mt940", async (req, res) => {
                   user,
                   newArr,
                   fields,
-                  statement,
-                //   statement.accountId,
-                //   statement.openingBalance,
-                //   statement.closingBalance,
-                //   statement.closingAvailableBalance
+                  statement.accountId,
+                  statement.openingBalance,
+                  statement.closingBalance,
+                  statement.closingAvailableBalance
                 ).then((fname) => {
                   filename = fname;
                   doit();
