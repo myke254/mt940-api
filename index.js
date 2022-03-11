@@ -14,7 +14,7 @@ const wb = new xl.Workbook();
 var filename = "";
 let bucketName = "jazia-51e09.appspot.com";
 app.use(express.json({ extended: false }));
-app.get("/", (req, res) => res.status(200).send("hello mike"));
+app.get("/", (req, res) => res.status(200).send("mt940 server is up and running"));
 
 var ws;
 const storage = new Storage({
