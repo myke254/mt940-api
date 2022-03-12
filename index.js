@@ -445,7 +445,8 @@ app.post("/mt940", async (req, res) => {
             }
           })
           .then((_) => {
-            if (statement != undefined) {
+            console.log(statement);
+            if (statement.length!=0) {
               const uploadFileAsync = () => {
                 return new Promise((resolve) => {
                   setTimeout(() => resolve(uploadFile(filename)), 2000);
