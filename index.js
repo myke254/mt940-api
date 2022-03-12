@@ -184,13 +184,14 @@ const convertToExcel = async (
       let columnIndex = 1;
 
       for (var i in headingColumnNames) {
+        console.log(record)
         // console.log(record[header]);
         ws.cell(rowIndex, columnIndex++).string(
           headingColumnNames[i] == "isCredit"
             ? record[headingColumnNames[i]] === true
               ? "Credit"
               : "Debit"
-            : record[headingColumnNames[i]].toString()
+            : record[headingColumnNames[i]]!=undefined?record[headingColumnNames[i]].toString():""
         );
       }
       rowIndex++;
@@ -382,7 +383,7 @@ app.post("/mt940", async (req, res) => {
                     );
                   }
                 } else if (type === "Cr") {
-                  console.log(type);
+                 // console.log(type);
                   if (get === "range") {
                     newArr.push(
                       trans.filter(function (x) {
@@ -445,7 +446,7 @@ app.post("/mt940", async (req, res) => {
             }
           })
           .then((_) => {
-            console.log(statement);
+           // console.log(statement);
             if (statement.length!=0) {
               const uploadFileAsync = () => {
                 return new Promise((resolve) => {
