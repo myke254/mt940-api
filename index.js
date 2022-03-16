@@ -59,7 +59,16 @@ const convertToExcel = async (
   //   closingAvailableBalance
 ) => {
   filename = __dirname + `/${username}.xlsx`;
-
+  const bgStyle =(bgColor,fgColor,patternType)=>{
+    return wb.createStyle({
+    fill: {
+      type: "pattern",
+      patternType:patternType?? "solid",
+      bgColor: bgColor,
+      fgColor: fgColor,
+    },
+  });
+}
   for (var j in data) {
     ws = wb.addWorksheet(statement[j].referenceNumber.toString());
 
@@ -68,7 +77,7 @@ const convertToExcel = async (
     headingColumnNames.forEach((heading) => {
       ws.cell(1, headingColumnIndex++).string(
         heading == "isCredit" ? "type" : heading
-      );
+      ).style(bgStyle("#FFFF00","#FFFF00"));
     });
     ws.cell(2, headingColumnNames.length + 2).string(
       statement[j].openingBalance == undefined
@@ -99,7 +108,7 @@ const convertToExcel = async (
           : !ob
           ? ""
           : statement[j].openingBalance.value.toString()
-      ),
+      ).style(bgStyle("#ADD8E6","#ADD8E6")),
       ws
         .cell(3, headingColumnNames.length + 3)
         .string(
@@ -108,7 +117,7 @@ const convertToExcel = async (
             : !cb
             ? ""
             : statement[j].closingBalance.value.toString()
-        ),
+        ).style(bgStyle("#ADD8E6","#ADD8E6")),
       ws
         .cell(4, headingColumnNames.length + 3)
         .string(
@@ -117,7 +126,7 @@ const convertToExcel = async (
             : !cab
             ? ""
             : statement[j].closingAvailableBalance.value.toString()
-        );
+        ).style(bgStyle("#ADD8E6","#ADD8E6"));
     ws
       .cell(2, headingColumnNames.length + 4)
       .string(
@@ -184,7 +193,7 @@ const convertToExcel = async (
       let columnIndex = 1;
 
       for (var i in headingColumnNames) {
-        console.log(record);
+       // console.log(record);
         // console.log(record[header]);
         ws.cell(rowIndex, columnIndex++).string(
           headingColumnNames[i] == "isCredit"
@@ -194,6 +203,8 @@ const convertToExcel = async (
             : record[headingColumnNames[i]] != undefined
             ? record[headingColumnNames[i]].toString()
             : ""
+        ).style(
+          headingColumnNames[i] == "amount"?bgStyle("#ADD8E6","#ADD8E6"):bgStyle("#FFFFFF","#FFFFFF","none")
         );
       }
       rowIndex++;
