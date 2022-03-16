@@ -70,21 +70,21 @@ const convertToExcel = async (
         heading == "isCredit" ? "type" : heading
       );
     });
-    ws.cell(2, headingColumnNames.length + 1).string(
+    ws.cell(2, headingColumnNames.length + 2).string(
       statement[j].openingBalance == undefined
         ? ""
         : !ob
         ? ""
         : `OPENING BALANCE AS AT ${statement[j].openingBalance.date}`
     );
-    ws.cell(3, headingColumnNames.length + 1).string(
+    ws.cell(3, headingColumnNames.length + 2).string(
       statement[j].closingBalance == undefined
         ? ""
         : !cb
         ? ""
         : `CLOSING BALANCE AS AT ${statement[j].closingBalance.date}`
     );
-    ws.cell(4, headingColumnNames.length + 1).string(
+    ws.cell(4, headingColumnNames.length + 2).string(
       statement[j].closingAvailableBalance == undefined
         ? ""
         : !cab
@@ -92,7 +92,7 @@ const convertToExcel = async (
         : `CLOSING AVAILABLE BALANCE AS AT ${statement[j].closingAvailableBalance.date}`
     );
     ws
-      .cell(2, headingColumnNames.length + 2)
+      .cell(2, headingColumnNames.length + 3)
       .string(
         statement[j].openingBalance == undefined
           ? ""
@@ -101,7 +101,7 @@ const convertToExcel = async (
           : statement[j].openingBalance.value.toString()
       ),
       ws
-        .cell(3, headingColumnNames.length + 2)
+        .cell(3, headingColumnNames.length + 3)
         .string(
           statement[j].closingBalance == undefined
             ? ""
@@ -110,7 +110,7 @@ const convertToExcel = async (
             : statement[j].closingBalance.value.toString()
         ),
       ws
-        .cell(4, headingColumnNames.length + 2)
+        .cell(4, headingColumnNames.length + 3)
         .string(
           statement[j].closingAvailableBalance == undefined
             ? ""
@@ -119,7 +119,7 @@ const convertToExcel = async (
             : statement[j].closingAvailableBalance.value.toString()
         );
     ws
-      .cell(2, headingColumnNames.length + 3)
+      .cell(2, headingColumnNames.length + 4)
       .string(
         statement[j].openingBalance == undefined
           ? ""
@@ -128,7 +128,7 @@ const convertToExcel = async (
           : statement[j].openingBalance.currency
       ),
       ws
-        .cell(3, headingColumnNames.length + 3)
+        .cell(3, headingColumnNames.length + 4)
         .string(
           statement[j].closingBalance == undefined
             ? ""
@@ -137,7 +137,7 @@ const convertToExcel = async (
             : statement[j].closingBalance.currency
         ),
       ws
-        .cell(4, headingColumnNames.length + 3)
+        .cell(4, headingColumnNames.length + 4)
         .string(
           statement[j].closingAvailableBalance == undefined
             ? ""
@@ -146,7 +146,7 @@ const convertToExcel = async (
             : statement[j].closingAvailableBalance.currency
         );
     ws
-      .cell(2, headingColumnNames.length + 4)
+      .cell(2, headingColumnNames.length + 5)
       .string(
         statement[j].openingBalance == undefined
           ? ""
@@ -157,7 +157,7 @@ const convertToExcel = async (
           : "debit"
       ),
       ws
-        .cell(3, headingColumnNames.length + 4)
+        .cell(3, headingColumnNames.length + 5)
         .string(
           statement[j].closingBalance == undefined
             ? ""
@@ -168,7 +168,7 @@ const convertToExcel = async (
             : "debit"
         ),
       ws
-        .cell(4, headingColumnNames.length + 4)
+        .cell(4, headingColumnNames.length + 5)
         .string(
           statement[j].closingAvailableBalance == undefined
             ? ""
@@ -184,14 +184,16 @@ const convertToExcel = async (
       let columnIndex = 1;
 
       for (var i in headingColumnNames) {
-        console.log(record)
+        console.log(record);
         // console.log(record[header]);
         ws.cell(rowIndex, columnIndex++).string(
           headingColumnNames[i] == "isCredit"
             ? record[headingColumnNames[i]] === true
               ? "Credit"
               : "Debit"
-            : record[headingColumnNames[i]]!=undefined?record[headingColumnNames[i]].toString():""
+            : record[headingColumnNames[i]] != undefined
+            ? record[headingColumnNames[i]].toString()
+            : ""
         );
       }
       rowIndex++;
@@ -255,18 +257,19 @@ const convertToPDF = async (
     pdfDoc.table(table, {
       // A4 595.28 x 841.89 (portrait) (about width sizes)
       width: 500,
-      
+
       padding: 5,
-      columnSpacing: 5, 
+      columnSpacing: 5,
       prepareHeader: () => pdfDoc.font("Helvetica-Bold").fontSize(10),
       prepareRow: (row, indexColumn, indexRow, rectRow) => {
-        indexColumn === 0 && pdfDoc.addBackground(rectRow, (indexRow % 2 ? 'red' : 'green') ,0.5);
+        indexColumn === 0 &&
+          pdfDoc.addBackground(rectRow, indexRow % 2 ? "red" : "green", 0.5);
         pdfDoc.font("Helvetica").fontSize(8);
       },
-    divider: {
-      header: {disabled: false, width: 2, opacity: 1},
-      horizontal: {disabled: false, width: 1, opacity: 0.8},
-    },
+      divider: {
+        header: { disabled: false, width: 2, opacity: 1 },
+        horizontal: { disabled: false, width: 1, opacity: 0.8 },
+      },
     });
 
     pdfDoc.moveDown();
@@ -383,7 +386,7 @@ app.post("/mt940", async (req, res) => {
                     );
                   }
                 } else if (type === "Cr") {
-                 // console.log(type);
+                  // console.log(type);
                   if (get === "range") {
                     newArr.push(
                       trans.filter(function (x) {
@@ -446,8 +449,8 @@ app.post("/mt940", async (req, res) => {
             }
           })
           .then((_) => {
-           // console.log(statement);
-            if (statement.length!=0) {
+            // console.log(statement);
+            if (statement.length != 0) {
               const uploadFileAsync = () => {
                 return new Promise((resolve) => {
                   setTimeout(() => resolve(uploadFile(filename)), 2000);
